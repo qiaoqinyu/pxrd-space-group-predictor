@@ -1,4 +1,4 @@
-# XRayPro Space-Group Screening (staging)
+# PXRD-Guided Space-Group Screening
 
 This is a clean, non-public staging tree for the core method used to rank molecular-crystal space groups from PXRD and molecular information.
 
