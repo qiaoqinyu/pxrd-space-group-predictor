@@ -159,4 +159,4 @@ reports an MKL OpenMP symbol error, prefix the command with
 
 ## Release status
 
-The software license, citation metadata, authorship, public repository visibility, model-weight release and any data/Zenodo deposit remain pending separate approval. Do not publish this staging tree as-is.
+This GitHub repository is currently private. A public release, software license, citation metadata, authorship details, model-weight release and any data/Zenodo deposit remain subject to separate approval. Do not treat this private repository as a public release.
