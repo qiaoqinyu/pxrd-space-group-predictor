@@ -1,0 +1,25 @@
+{
+  "pxrd_length": 3400,
+  "smiles_embedding_dim": 768,
+  "num_classes": 11,
+  "atom_dim": 92,
+  "nbr_dim": 41,
+  "hidden_dim": 128,
+  "projection_dim": 64,
+  "graph_layers": 2,
+  "dropout": 0.1,
+  "prediction_modality": "pxrd_smiles",
+  "class_space_groups": [
+    1,
+    2,
+    4,
+    7,
+    14,
+    18,
+    19,
+    29,
+    33,
+    61,
+    null
+  ]
+}

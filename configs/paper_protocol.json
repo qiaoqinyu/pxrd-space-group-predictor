@@ -1,0 +1,105 @@
+{
+  "purpose": "Document current manuscript/SI numerical settings; external sections do not launch calculations.",
+  "baseline_date": "2026-10-08",
+  "classification": {
+    "grid_start_degrees": 2.0,
+    "grid_step_degrees": 0.02,
+    "grid_points": 3400,
+    "baseline_percentile": 5,
+    "baseline_window": 601,
+    "baseline_padding": "nearest",
+    "linear_maximum": 100,
+    "class_space_groups": [
+      1,
+      2,
+      4,
+      7,
+      14,
+      18,
+      19,
+      29,
+      33,
+      61,
+      null
+    ],
+    "pretraining_seed": 240427,
+    "experimental_seeds": [
+      240427,
+      240428,
+      240429,
+      240430,
+      240431
+    ],
+    "primary_test_records": 1655,
+    "adaptation_records": 512,
+    "validation_records": 266
+  },
+  "dtw": {
+    "intensity_transform": "linear",
+    "pooling_factor": 5,
+    "dtaidistance_window": 31,
+    "maximum_pooled_displacement": 30,
+    "inner_distance": "euclidean",
+    "penalty": 0,
+    "psi": 0,
+    "normalization": "divide accumulated cost by sqrt(pooled length)",
+    "energy_candidates": 200,
+    "dtw_shortlist": 10
+  },
+  "external_structure_matcher": {
+    "ltol": 0.2,
+    "stol": 0.3,
+    "angle_tol": 5,
+    "comparator": "ElementComparator",
+    "ignored_species": [
+      "H"
+    ],
+    "primitive_cell": false,
+    "scale": true,
+    "attempt_supercell": false,
+    "energy_density_prefilter": false
+  },
+  "external_packing_validation": {
+    "shell_molecules": 15,
+    "minimum_matched_molecules": 15,
+    "distance_tolerance": 0.2,
+    "angle_tolerance_degrees": 20,
+    "ignore_hydrogen_positions": true,
+    "ignore_hydrogen_counts": true,
+    "ignore_bond_counts": true,
+    "allow_artificial_inversion": true,
+    "reference": "unoptimized experimental CIF"
+  },
+  "external_csp": {
+    "conformers": 20,
+    "ETKDG_version": 3,
+    "seed": 240430,
+    "RMS_pruning_angstrom": 0.1,
+    "molecular_optimization": "UFF",
+    "generated_candidates_per_space_group": 5000,
+    "Z_prime": 1,
+    "mace_model": "MACE-OFF23-small",
+    "pressure_stage_eV_A3": 0.0006,
+    "final_pressure_eV_A3": 0,
+    "force_threshold_eV_A": 0.01,
+    "max_steps_per_stage": 3000,
+    "stages": [
+      "UnitCellFilter/BFGSFusedLS",
+      "UnitCellFilter/BFGS"
+    ]
+  },
+  "external_dft": {
+    "program": "VASP 5.4.4",
+    "functional": "PBE",
+    "dispersion": "D3(BJ)",
+    "IVDW": 12,
+    "ENCUT_eV": 520,
+    "EDIFF_eV": 1e-06,
+    "force_threshold_eV_A": 0.02,
+    "ISIF": 3,
+    "IBRION": 2,
+    "ISYM": 0,
+    "energy": "final OUTCAR energy(sigma->0) divided by molecules per cell",
+    "scope": "Three selected structures only; no convergence-study or unconstrained-cell claim"
+  }
+}
