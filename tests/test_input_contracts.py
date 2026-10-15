@@ -17,6 +17,7 @@ import torch
 
 from examples.make_synthetic_data import make_bundle
 from src.data.arrays import load_array_bundle
+from src.data.pxrd import CLASSIFICATION_GRID, preprocess_experimental, augment_csd_profile
 from src.evaluation.metrics import topk_summary
 from src.models.xraypro import CrystalGraphEncoder, ModelConfig, XRayProModel
 from src.runtime.checkpoints import load_checkpoint, save_checkpoint
@@ -64,6 +65,28 @@ class InputContractTest(unittest.TestCase):
             for value in (np.nan, np.inf, 1e100):
                 with self.subTest(key=key, value=value), self.assertRaises(ValueError):
                     self.load(**{key: np.full(self.arrays[key].shape, value)})
+
+    def test_classifier_rejects_profiles_without_positive_signal(self) -> None:
+        cases = [([80., 81.], [10., 100.]),
+                 (CLASSIFICATION_GRID, np.zeros(3400)),
+                 (CLASSIFICATION_GRID, np.ones(3400))]
+        for theta, intensity in cases:
+            with self.subTest(points=len(theta)), self.assertRaisesRegex(ValueError, "positive signal"):
+                preprocess_experimental(theta, intensity)
+
+    def test_bundle_reports_zero_signal_row(self) -> None:
+        for value in (0., 1e-100):
+            profiles = self.arrays["pxrd"].astype(np.float64)
+            profiles[1] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, r"positive signal.*\[1\]"):
+                self.load(pxrd=profiles)
+        self.assertEqual(self.load().size, 3)
+
+    def test_csd_augmentation_rejects_zero_signal_before_random_draws(self) -> None:
+        for epoch in (0, 1, 2):
+            with self.subTest(epoch=epoch), self.assertRaisesRegex(ValueError, "positive signal"):
+                augment_csd_profile(torch.zeros(3400), seed=240427, epoch=epoch,
+                                    index=0, row_index=0)
 
     def test_graph_contract_rejects_bad_indices_axes_and_masks(self) -> None:
         changes = [

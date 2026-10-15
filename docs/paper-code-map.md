@@ -1,7 +1,8 @@
 # Correspondence to the current manuscript and Supporting Information
 
-Baseline: 8 October 2026, manuscript `results_discussion_refined` and complete
-SI `integrated_checked`. This document supersedes the protocol descriptions in
+Baseline: 16 October 2026, manuscript
+`乔钦禹文章最新版本-2026.10.16_reviewed_21.docx` and
+`Supporting_Information_2026.10.16_reviewed_07.docx`. This document supersedes the protocol descriptions in
 the September staging audit, which remains a historical record.
 
 | Paper component | Public implementation | Verification or boundary |
@@ -64,7 +65,8 @@ The optional PXRD-only API is a generic facility, not a reported experiment.
 
 AdamW head parameters include `multi_fuse`, `multi_head`, `multi_proj`,
 `graph_head` and `graph_proj`. The scheduler uses factor 0.3, patience 8 and
-minimum LR 5e-7; early stopping uses patience 25. These are exposed CLI values,
+minimum LR 5e-7. With patience 8, the learning rate drops after nine
+consecutive validation evaluations without improvement; early stopping uses patience 25. These are exposed CLI values,
 not an assertion that new runs reproduce the historical checkpoints.
 
 CSD perturbations use Gaussian sigma 0.002 times the current maximum and
@@ -86,12 +88,13 @@ establish molecule-disjoint membership from metric values.
 
 Candidate and experimental profiles must already share the grid 2.00–69.98°,
 step 0.02°, and measured angular support. Crop both with `--start-index` and
-`--stop-index` before pooling. Simulation uses Cu Kα 1.54184 Å, pseudo-Voigt
+`--stop-index` before subtracting the experimental minimum or normalizing. Simulation uses Cu Kα 1.54184 Å, pseudo-Voigt
 FWHM 0.15° and Lorentz fraction 0.5. This package scores profiles; simulation
 from structures remains external.
 
-The experimental DTW profile receives minimum subtraction, not the classifier's
-rolling-percentile background subtraction. Both profiles use linear max100
+After cropping, the minimum experimental intensity within the measured range
+is subtracted from the experimental profile only. This is separate from the
+classifier's rolling-percentile background subtraction. Both profiles use linear max100
 intensities, five-point max pooling and L2 normalization. The incomplete final
 bin is discarded. Scalar Euclidean cost is absolute difference; the result is
 the **sum of costs along the optimal path divided by sqrt(pooled length)**,
@@ -111,6 +114,14 @@ launch instructions. In particular, independent matches require all 15
 molecules in the packing shell, and retrospective reference selection uses
 only matches within the final ten. The historical nine-case SI figures concern
 full candidate pools and are not the current 200-candidate screening panels.
+
+## Input validation
+
+Classification preprocessing rejects profiles with no positive signal after
+background correction. Array loading rejects rows with no positive signal in
+float32 and reports their zero-based row indices. CSD augmentation rejects
+profiles with no positive signal before drawing noise or background values.
+These checks reject unusable inputs without changing valid-profile processing.
 
 ## Verification scope
 

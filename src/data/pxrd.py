@@ -27,8 +27,10 @@ def preprocess_experimental(theta: np.ndarray, intensity: np.ndarray) -> np.ndar
     profile = np.interp(CLASSIFICATION_GRID, theta, intensity, left=0.0, right=0.0)
     baseline = percentile_filter(profile, percentile=5, size=601, mode="nearest")
     profile = np.maximum(profile - baseline, 0.0)
-    if profile.max() > 0:
-        profile *= 100.0 / profile.max()
+    if not np.any(profile > 0):
+        raise ValueError("experimental PXRD has no positive signal after preprocessing; "
+                         "check the measured angular range and intensities")
+    profile *= 100.0 / profile.max()
     return profile.astype(np.float32)
 
 
@@ -38,6 +40,9 @@ def augment_csd_profile(profile: torch.Tensor, *, seed: int, epoch: int,
     profile = profile.clone()
     if profile.ndim != 1 or not bool(torch.isfinite(profile).all()) or bool((profile < 0).any()):
         raise ValueError("CSD profile must be a finite non-negative vector")
+
+    if profile.numel() == 0 or not bool((profile > 0).any()):
+        raise ValueError("CSD PXRD must contain positive signal before augmentation")
 
     def generator(offset):
         return torch.Generator().manual_seed(

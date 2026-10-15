@@ -117,6 +117,13 @@ def load_array_bundle(
         raise ValueError("sample_id must have shape [N]")
     if "pxrd" in arrays and arrays["pxrd"].ndim != 2:
         raise ValueError("pxrd must have shape [N, L]")
+    if "pxrd" in arrays:
+        invalid_rows = np.flatnonzero(~(arrays["pxrd"].astype(np.float32) > 0).any(axis=1))
+        if invalid_rows.size:
+            raise ValueError(
+                f"{path}: pxrd must contain positive signal in float32; "
+                f"invalid zero-based row indices: {invalid_rows.tolist()}"
+            )
     if "smiles_embedding" in arrays and arrays["smiles_embedding"].ndim != 2:
         raise ValueError("smiles_embedding must have shape [N, D]")
     if "labels" in arrays:
