@@ -7,7 +7,7 @@ dist/
 .pytest_cache/
 coverage.xml
 runs/
-data/
+/data/
 *.npy
 *.npz
 *.pt
