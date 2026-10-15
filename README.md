@@ -1,4 +1,4 @@
-# PXRD-Guided Space-Group Screening
+# PXRD Space Group Predictor
 
 This repository provides the core method used to rank molecular-crystal space groups from PXRD and molecular information.
 
@@ -159,4 +159,4 @@ reports an MKL OpenMP symbol error, prefix the command with
 
 ## Release status
 
-This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-spacegroup-csp. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. Software licensing, citation metadata, model-weight release and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.
+This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-space-group-predictor. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. Software licensing, citation metadata, model-weight release and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.
