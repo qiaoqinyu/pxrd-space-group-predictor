@@ -1,6 +1,6 @@
 # PXRD-Guided Space-Group Screening
 
-This is a clean, non-public staging tree for the core method used to rank molecular-crystal space groups from PXRD and molecular information.
+This repository provides the core method used to rank molecular-crystal space groups from PXRD and molecular information.
 
 The code exposes the following reader-facing workflows:
 
@@ -14,7 +14,7 @@ The formal model uses a 3,400-point PXRD grid, a squeeze-and-excitation residual
 
 ## Scope
 
-This repository is a code staging artifact, not a public release and not a complete paper-reproduction package. It intentionally excludes:
+This repository provides the core software, not a complete paper-reproduction package. It intentionally excludes:
 
 - licensed CSD and ICDD/PDF source records and row-level derivatives;
 - molecular identifiers, experimental PXRD arrays, crystal coordinates and CIFs;
@@ -159,4 +159,4 @@ reports an MKL OpenMP symbol error, prefix the command with
 
 ## Release status
 
-This GitHub repository is currently private. A public release, software license, citation metadata, authorship details, model-weight release and any data/Zenodo deposit remain subject to separate approval. Do not treat this private repository as a public release.
+This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-spacegroup-csp. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. Software licensing, citation metadata, model-weight release and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.

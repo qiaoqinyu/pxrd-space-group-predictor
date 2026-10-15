@@ -21,4 +21,4 @@ Candidate generation, MACE relaxation, packing-basin deduplication and independe
 
 ## Pending decisions
 
-Software licensing, authorship and citation metadata, repository visibility, model-weight redistribution, data assets and Zenodo deposition require separate approval.
+Software licensing, authorship and citation metadata, model-weight redistribution, data assets and Zenodo deposition require separate approval.
