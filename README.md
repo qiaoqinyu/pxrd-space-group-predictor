@@ -157,6 +157,62 @@ compares both Python and C dtaidistance implementations. If the environment
 reports an MKL OpenMP symbol error, prefix the command with
 `MKL_THREADING_LAYER=GNU`; this is an environment workaround, not a model setting.
 
+## Agent skill
+
+The repository includes [PXRD space-group screening](skills/pxrd-space-group-screening/SKILL.md),
+a reusable skill for agents working with this project. Clone the repository and
+install its dependencies in a Python 3.10+ environment:
+
+```bash
+git clone https://github.com/qiaoqinyu/pxrd-space-group-predictor.git
+cd pxrd-space-group-predictor
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[embedding]'
+```
+
+Open this checkout in an agent that supports project skills. The symlink under
+`.agents/skills/` points to the canonical skill. In Codex, invoke
+`$pxrd-space-group-screening`; with other agents, provide the full path to
+`skills/pxrd-space-group-screening/SKILL.md` and ask the agent to follow it.
+Keep the skill with the repository because it calls the repository's CLI tools.
+No global skill installation is required.
+
+For example, ask your agent:
+
+> Use the pxrd-space-group-screening skill to predict the top three space groups
+> from my observed.txt and molecules.csv, using my compatible trained checkpoint.
+> Save the commands, input hashes and predictions in a new runs/ directory.
+
+**Trained checkpoints are not currently distributed in this repository.**
+Prediction requires a separately obtained compatible checkpoint, its model
+configuration, class mapping and preprocessing/embedding provenance. No public
+weight download is available yet. The agent must report this missing requirement
+when no checkpoint is supplied. Candidate DTW ranking can run without a classifier
+checkpoint. The synthetic example tests software execution only.
+
+The skill prepares prediction inputs and ranks existing candidates. CSP
+generation, MACE relaxation and DFT use separate workflows.
+
+To assemble prepared profiles and cached molecular embeddings, use:
+
+```bash
+python tools/build_inference_bundle.py --manifest profiles.csv --embeddings embeddings.npz --config configs/model.example.json --output runs/task/inference.npz
+```
+
+The CSV requires `sample_id,pxrd_path`; relative paths resolve against the CSV.
+The NPZ requires string `sample_id` and numeric `smiles_embedding` arrays.
+Rows are joined by ID, and the ID sets must match exactly. Duplicate IDs,
+invalid arrays and existing output paths are rejected.
+
+For a trusted original SE-Res/simple-graph embedding checkpoint, use
+`tools/import_legacy_checkpoint.py --help`. Supply a verified SHA256, the verified
+model configuration and an explicit provenance label. The importer requires the
+3400-point grid and creates a separate schema-1 copy by renaming graph keys;
+it does not change learned tensors. Check original-versus-converted predictions
+before scientific use. Weights and licensed inputs remain private until separately
+authorized for release.
+
 ## Release status
 
 This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-space-group-predictor. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. Software licensing, citation metadata, model-weight release and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.
