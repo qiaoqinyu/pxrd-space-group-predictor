@@ -16,6 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 verification = ["dtaidistance>=2.3"]
+structures = ["rdkit>=2024.3", "pymatgen>=2024.5", "ase>=3.23"]
 embedding = [
   "safetensors>=0.4",
   "tokenizers>=0.19",

@@ -1,6 +1,6 @@
 {
-  "purpose": "Document current manuscript/SI numerical settings; external sections do not launch calculations.",
-  "baseline_date": "2026-10-08",
+  "purpose": "Record manuscript/SI settings; downstream adapters use the fixed protocols documented in docs/downstream-workflow.md. External key names are retained for compatibility.",
+  "baseline_date": "2026-10-18",
   "classification": {
     "grid_start_degrees": 2.0,
     "grid_step_degrees": 0.02,
@@ -86,7 +86,10 @@
     "stages": [
       "UnitCellFilter/BFGSFusedLS",
       "UnitCellFilter/BFGS"
-    ]
+    ],
+    "bomlip_commit": "2caf530c8aa2ca14230264bfe69bfbcd6952b41e",
+    "mace_sha256": "165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f",
+    "energy_unit": "kJ/mol per molecule"
   },
   "external_dft": {
     "program": "VASP 5.4.4",

@@ -1,8 +1,8 @@
 # Correspondence to the current manuscript and Supporting Information
 
-Baseline: 16 October 2026, manuscript
-`乔钦禹文章最新版本-2026.10.16_reviewed_21.docx` and
-`Supporting_Information_2026.10.16_reviewed_07.docx`. This document supersedes the protocol descriptions in
+Baseline: 18 October 2026, manuscript
+`乔钦禹文章-2026.10.18_agent_workflow_reviewed.docx` and
+`乔钦禹文章Supporting_Information_2026.10.18_agent_workflow_reviewed.docx`. This document supersedes the protocol descriptions in
 the September staging audit, which remains a historical record.
 
 | Paper component | Public implementation | Verification or boundary |
@@ -17,8 +17,8 @@ the September staging audit, which remains a historical record.
 | SI-8 DTW | `src/runtime/pxrd_dtw.py` | Linear intensities; Euclidean local cost; radius 30/window 31; normalize by sqrt(length). |
 | SI-8 energy-to-DTW selection | `screen_candidates`, `tools/score_pxrd_candidates.py` | Already deduplicated input; select 200 by energy/ID, then ten by DTW/energy/ID. |
 | SI-2 fixed split and molecular exclusion | External data preparation | No random split substitutes for the fixed 512/266/1655 paper protocol. |
-| SI-7 generation and MACE relaxation | External CSP implementation | Not bundled or executed by this public core. |
-| SI-8 packing deduplication/validation and retrospective reference | External structural analysis | DTW agreement is not a packing match; ranking does not inspect reference labels. |
+| SI-7 generation and MACE relaxation | Downstream CLI adapters | `tools/generate_crystal_candidates.py` and `tools/relax_crystal_candidates.py` call the pinned external engine; models are not bundled. |
+| SI-8 packing deduplication/validation and retrospective reference | `crystal_processing.py`, `validate_crystal_packing.py` | DTW agreement is not a packing match; ranking does not inspect reference labels. |
 | SI-9 VASP comparison | External DFT calculation | The three-structure result is evidence, not a classifier/DTW implementation. |
 
 ## Architecture and class mapping
@@ -89,8 +89,7 @@ establish molecule-disjoint membership from metric values.
 Candidate and experimental profiles must already share the grid 2.00–69.98°,
 step 0.02°, and measured angular support. Crop both with `--start-index` and
 `--stop-index` before subtracting the experimental minimum or normalizing. Simulation uses Cu Kα 1.54184 Å, pseudo-Voigt
-FWHM 0.15° and Lorentz fraction 0.5. This package scores profiles; simulation
-from structures remains external.
+FWHM 0.15° and Lorentz fraction 0.5. This package simulates profiles with `tools/process_crystal_candidates.py` before scoring.
 
 After cropping, the minimum experimental intensity within the measured range
 is subtracted from the experimental profile only. This is separate from the
@@ -107,10 +106,7 @@ set; no structures are fabricated or added. Identifiers are unique strings and
 sort lexicographically for ties. The full scorer without metadata is separate
 from this selection mode.
 
-StructureMatcher deduplication, MACE optimization, PackingSimilarity and VASP
-remain external. Their current parameter boundary is recorded in
-`configs/paper_protocol.json`; these values are documentation, not runtime
-launch instructions. In particular, independent matches require all 15
+Downstream adapters implement StructureMatcher compression and simulation and call pinned BOMLIP/MACE and licensed PackingSimilarity. VASP remains external. `docs/downstream-workflow.md` gives launch instructions; `configs/paper_protocol.json` records numerical settings. In particular, independent matches require all 15
 molecules in the packing shell, and retrospective reference selection uses
 only matches within the final ten. The historical nine-case SI figures concern
 full candidate pools and are not the current 200-candidate screening panels.

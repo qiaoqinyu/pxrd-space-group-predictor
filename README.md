@@ -8,7 +8,9 @@ The code exposes the following reader-facing workflows:
 - evaluate ordinary and class-balanced TOP-K recall;
 - run graph-free inference from PXRD and molecular embeddings;
 - preprocess experimental PXRD for classification;
-- rank precomputed candidate PXRD profiles with constrained dynamic time warping (DTW), optionally after an energy filter.
+- rank precomputed candidate PXRD profiles with constrained dynamic time warping (DTW), optionally after an energy filter;
+- prepare conformers, run pinned BOMLIP-CSP generation and two-stage MACE relaxation, deduplicate structures and simulate PXRD;
+- optionally validate crystal packing with a separately licensed CSD Python API.
 
 The formal model uses a 3,400-point PXRD grid, a squeeze-and-excitation residual PXRD encoder, cached molecular embeddings, and a lightweight two-layer graph encoder during training. The graph pathway supplies classification and representation-alignment supervision. Evaluated inference logits use only PXRD and the molecular embedding.
 
@@ -20,9 +22,9 @@ This repository provides the core software, not a complete paper-reproduction pa
 - molecular identifiers, experimental PXRD arrays, crystal coordinates and CIFs;
 - trained checkpoints whose redistribution rights have not been cleared;
 - manuscript, figure, Supporting Information and internal evidence builders;
-- case-specific CSP generation, MACE relaxation, packing deduplication and PackingSimilarity validation.
+- historical case-specific calculation outputs and proprietary computational engines.
 
-Candidate generation and relaxation are external to this package. DTW is a PXRD-consistency ranking signal and does not establish crystal-packing identity.
+Downstream adapters call separately installed scientific engines. See [the downstream workflow](docs/downstream-workflow.md) for dependencies, fixed parameters and commands. DTW is a PXRD-consistency ranking signal and does not establish crystal-packing identity.
 
 ## Install
 
@@ -68,8 +70,7 @@ interpolation with zero fill outside measured support, a centered 601-point
 fifth-percentile baseline with nearest-edge padding, clipping at zero and
 maximum scaling to 100. Outputs are linear intensities, not log1p caches.
 Training and prediction consume these prepared arrays without preprocessing
-them a second time. CIF simulation and licensed database extraction remain
-external; they are not performed by this command. Use the same preparation and embedding protocol for training and
+them a second time. CIF simulation is available in the downstream workflow; licensed database extraction remains external. Neither is performed by this command. Use the same preparation and embedding protocol for training and
 inference. Matching the array length alone does not establish compatibility
 with a checkpoint. Custom grids are supported for models trained on those grids.
 
@@ -144,7 +145,7 @@ supplied profiles; it does not apply the paper screening sequence. No packing
 labels or experimental structure are used for ranking.
 
 See [paper-to-code correspondence](docs/paper-code-map.md) for training stages,
-metrics, numerical definitions and the separate external CSP/DFT boundary.
+metrics, numerical definitions, downstream adapters and the external DFT boundary.
 
 Run the synthetic CPU regression suite with:
 
@@ -191,8 +192,12 @@ weight download is available yet. The agent must report this missing requirement
 when no checkpoint is supplied. Candidate DTW ranking can run without a classifier
 checkpoint. The synthetic example tests software execution only.
 
-The skill prepares prediction inputs and ranks existing candidates. CSP
-generation, MACE relaxation and DFT use separate workflows.
+The skill also guides conformer preparation, BOMLIP-CSP generation, two-stage
+MACE relaxation, deduplication, simulated PXRD and optional CCDC packing
+validation. See [the downstream workflow](docs/downstream-workflow.md) for
+commands, dependencies and verification limits. DFT remains a separate workflow.
+The skill and CLI scripts are provided in the Git checkout; the Python wheel
+contains the importable runtime, not these repository-level files.
 
 To assemble prepared profiles and cached molecular embeddings, use:
 

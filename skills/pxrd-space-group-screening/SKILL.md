@@ -1,6 +1,6 @@
 ---
 name: pxrd-space-group-screening
-description: Rank molecular-crystal space groups from experimental PXRD and SMILES, or rank existing candidate PXRD profiles, using this repository's trained model and DTW tools.
+description: Rank molecular-crystal space groups from experimental PXRD and SMILES, prepare and relax crystal candidates with BOMLIP-CSP/MACE, and rank or validate candidates through the project's CLI tools.
 ---
 
 # PXRD-guided space-group screening
@@ -38,8 +38,18 @@ python tools/score_pxrd_candidates.py --reference observed_raw.npy --candidates 
 
 Set crop indices from actual support; the example assumes the full 3400-point grid was measured. Candidates must already be deduplicated within space groups and pooled over the selected groups for one molecule. Energies must be comparable per molecule and IDs must follow candidate rows. With energies and IDs the defaults retain up to 200 lowest-energy candidates and select up to ten by DTW. Without these inputs the command scores all supplied candidates and does not apply energy preselection. Read `README.md` for five-point pooling, L2 normalization, the DTW band and tie rules. Verify output IDs, counts and finite scores. Do not use known packing labels or inject a reference structure during ranking.
 
+## Generate, relax and process candidates (optional)
+
+Read `docs/downstream-workflow.md` before this branch. Obtain explicit authorization for generation/GPU computation and confirm concrete search groups; do not launch a 5,000-candidate search from a prediction-only request. Use a clean BOMLIP-CSP checkout at the documented commit, its configured environment and a hash-verified MACE-OFF23-small model. Do not edit an existing upstream worktree, download substitute weights or use Others as a search group. Check available hardware and use a new output directory for each stage.
+
+Run `tools/generate_crystal_candidates.py` with the requested single-component SMILES, stable sample ID and groups. The default is 5,000 candidates per group; smaller budgets are execution tests. Check `candidates.csv` and the hash-linked `generation.json`. Run `tools/relax_crystal_candidates.py` with that manifest and explicit model path. Molecular normalization comes from generation metadata, not a guessed cell divisor. Preserve candidate IDs and report step-limit statuses; completed output is not independent force-convergence certification.
+
+Run `tools/process_crystal_candidates.py` on `relaxed.csv` to deduplicate within groups and simulate PXRD. Use its aligned candidate, energy and ID arrays with the ranking command above. Always use the raw experimental pattern and actual measured support for DTW. Inspect counts, hashes, logs and finite energies/scores at each boundary; fail or report unresolved errors instead of silently omitting candidates.
+
+For optional post-ranking reference validation, run `tools/validate_crystal_packing.py` in a separately licensed CSD Python API environment, with an unoptimized experimental reference and a manifest for the intended candidate set. Errors/timeouts are unresolved, never negative matches. Reference labels cannot influence ranking. DFT remains separate.
+
 ## Deliver a traceable result
 
 Save commands, code revision, input/model hashes, preprocessing and embedding settings, class mapping, measured support, output paths and checks in the task output directory. Respect the redistribution terms for supplied data and checkpoints; share only assets authorized for release. Distinguish software execution checks from scientific validation. Report ranked space groups and, when requested, candidate rankings with their provenance and limitations. DTW ranks pattern agreement; it does not establish structural identity.
 
-The supported workflow ends at prediction or ranking supplied candidates. CSP generation, MACE relaxation, PackingSimilarity and DFT remain external workflows. Report that boundary when a request needs those stages; use their established procedures and execution authorization rather than claiming this skill runs them.
+The skill orchestrates CLI tools; external engines and licensed assets remain separate dependencies. Describe only stages actually executed and distinguish numerical protocol checks from historical reproduction. Do not claim improved scientific accuracy or autonomous validation merely because an agent ran the commands.

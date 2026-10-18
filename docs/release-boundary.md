@@ -15,9 +15,9 @@
 - Manuscript, SI, figure, manifest and checksum production.
 - Outcome-selected CSP case tables and diagnostics.
 
-## External CSP
+## Downstream adapters and external engines
 
-Candidate generation, MACE relaxation, packing-basin deduplication and independent packing validation are outside this repository. The public DTW utility consumes candidate profiles; it does not generate or validate crystal structures.
+Public tools prepare conformers, call a pinned clean BOMLIP-CSP snapshot, run the two-stage MACE protocol, deduplicate within space groups and simulate candidate PXRD. Optional PackingSimilarity validation requires a licensed CSD Python API. See `downstream-workflow.md`. External engines, trained models, licensed structures and historical case outputs are not bundled. DFT remains external. DTW ranks pattern consistency; packing validation is a separate post-ranking check.
 
 ## Pending decisions
 
