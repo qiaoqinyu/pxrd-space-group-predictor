@@ -62,6 +62,12 @@ class ExecutionTests(unittest.TestCase):
             with self.assertRaises(subprocess.TimeoutExpired):
                 run_logged([sys.executable, "-c", "import time; time.sleep(30)"], cwd=root, env=os.environ.copy(), log=root / "timeout.log", timeout=.1)
 
+    def test_packing_requires_separate_ccdc_api(self):
+        from tools.validate_crystal_packing import _load_ccdc
+        with patch.dict(sys.modules, {"ccdc": None, "ccdc.crystal": None, "ccdc.io": None}):
+            with self.assertRaisesRegex(RuntimeError, "separate CSD license"):
+                _load_ccdc()
+
     def test_packing_timeout_is_unresolved_and_fails_command(self):
         import csv
         import types
@@ -74,12 +80,15 @@ class ExecutionTests(unittest.TestCase):
             write_candidates(manifest, [candidate_row("test", 1, cif, energy=-1, status="completed")])
             fake = types.ModuleType("ccdc.crystal")
             fake.PackingSimilarity = lambda: object()
+            fake_io = types.ModuleType("ccdc.io")
+            fake_io.CrystalReader = object
             argv = ["packing", "--manifest", str(manifest), "--reference", str(cif), "--output-dir", str(root / "output")]
-            with patch.dict(sys.modules, {"ccdc": types.ModuleType("ccdc"), "ccdc.crystal": fake}), patch.object(sys, "argv", argv), patch("tools.validate_crystal_packing.subprocess.run", side_effect=subprocess.TimeoutExpired("packing", 30)):
+            with patch.dict(sys.modules, {"ccdc": types.ModuleType("ccdc"), "ccdc.crystal": fake, "ccdc.io": fake_io}), patch.object(sys, "argv", argv), patch("tools.validate_crystal_packing.subprocess.run", side_effect=subprocess.TimeoutExpired("packing", 30)):
                 with self.assertRaises(SystemExit) as error:
                     main()
             self.assertEqual(error.exception.code, 1)
-            rows = list(csv.DictReader((root / "output/packing.csv").open()))
+            with (root / "output/packing.csv").open() as stream:
+                rows = list(csv.DictReader(stream))
             self.assertEqual(rows[0]["status"], "timeout")
             self.assertEqual(rows[0]["hit"], "")
 

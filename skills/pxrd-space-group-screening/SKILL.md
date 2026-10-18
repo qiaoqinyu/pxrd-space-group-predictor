@@ -46,7 +46,7 @@ Run `tools/generate_crystal_candidates.py` with the requested single-component S
 
 Run `tools/process_crystal_candidates.py` on `relaxed.csv` to deduplicate within groups and simulate PXRD. Use its aligned candidate, energy and ID arrays with the ranking command above. Always use the raw experimental pattern and actual measured support for DTW. Inspect counts, hashes, logs and finite energies/scores at each boundary; fail or report unresolved errors instead of silently omitting candidates.
 
-For optional post-ranking reference validation, run `tools/validate_crystal_packing.py` in a separately licensed CSD Python API environment, with an unoptimized experimental reference and a manifest for the intended candidate set. Errors/timeouts are unresolved, never negative matches. Reference labels cannot influence ranking. DFT remains separate.
+For optional post-ranking reference validation, run `tools/validate_crystal_packing.py` only when the operator has a separate CSD license and a compatible CCDC Python API environment. The public repository does not include CSD records or the CCDC API. Users without this license must skip this step. Use an unoptimized experimental reference and a manifest for the intended candidate set. Errors/timeouts are unresolved, never negative matches. Reference labels cannot influence ranking. DFT remains separate.
 
 ## Deliver a traceable result
 

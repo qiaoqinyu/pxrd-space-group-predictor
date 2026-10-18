@@ -17,7 +17,7 @@
 
 ## Downstream adapters and external engines
 
-Public tools prepare conformers, call a pinned clean BOMLIP-CSP snapshot, run the two-stage MACE protocol, deduplicate within space groups and simulate candidate PXRD. Optional PackingSimilarity validation requires a licensed CSD Python API. See `downstream-workflow.md`. External engines, trained models, licensed structures and historical case outputs are not bundled. DFT remains external. DTW ranks pattern consistency; packing validation is a separate post-ranking check.
+Public tools prepare conformers, call a pinned clean BOMLIP-CSP snapshot, run the two-stage MACE protocol, deduplicate within space groups and simulate candidate PXRD. Optional PackingSimilarity validation is available only to users with a separate CSD license and a compatible CCDC Python API. The public repository does not provide CSD records, the CCDC API or a license. See `downstream-workflow.md`. External engines, trained models, licensed structures and historical case outputs are not bundled. DFT remains external. DTW ranks pattern consistency; packing validation is a separate post-ranking check.
 
 ## Pending decisions
 

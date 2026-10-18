@@ -11,9 +11,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src.runtime.crystal_candidates import read_candidates, sha256
 
 
+def _load_ccdc():
+    """Load the separately licensed CCDC CSD Python API."""
+    try:
+        from ccdc.crystal import PackingSimilarity
+        from ccdc.io import CrystalReader
+    except ImportError as exc:
+        raise RuntimeError(
+            "CCDC CSD Python API is not available. PackingSimilarity is an "
+            "optional post-ranking check and requires a separate CSD license "
+            "and a compatible local CCDC Python environment."
+        ) from exc
+    return PackingSimilarity, CrystalReader
+
+
 def compare(reference: Path, candidate: Path) -> dict:
-    from ccdc.crystal import PackingSimilarity
-    from ccdc.io import CrystalReader
+    PackingSimilarity, CrystalReader = _load_ccdc()
     engine = PackingSimilarity()
     settings = engine.settings
     settings.packing_shell_size = 15
@@ -35,7 +48,7 @@ def compare(reference: Path, candidate: Path) -> dict:
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--manifest", type=Path)
-    p.add_argument("--reference", type=Path, required=True, help="Unoptimized experimental reference CIF.")
+    p.add_argument("--reference", type=Path, required=True, help="Unoptimized experimental reference CIF in a separately licensed CSD environment.")
     p.add_argument("--output-dir", type=Path, required=True)
     p.add_argument("--timeout", type=float, default=30, help="Seconds per candidate.")
     p.add_argument("--_candidate", type=Path, help=argparse.SUPPRESS)
@@ -50,8 +63,12 @@ def main():
     if not args.manifest or not args.reference.is_file() or args.timeout <= 0:
         p.error("valid manifest, reference CIF and positive timeout are required")
     # Fail before creating results when the API is absent. License/runtime errors remain explicit.
-    from ccdc.crystal import PackingSimilarity
-    PackingSimilarity()
+    try:
+        PackingSimilarity, _ = _load_ccdc()
+        PackingSimilarity()
+    except RuntimeError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        raise SystemExit(2)
     rows = read_candidates(args.manifest)
     output = args.output_dir.resolve()
     output.mkdir(parents=True, exist_ok=False)

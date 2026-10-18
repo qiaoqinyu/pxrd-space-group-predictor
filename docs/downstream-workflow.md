@@ -124,7 +124,7 @@ never enter this selection. Fewer available candidates remain a smaller set.
 python tools/validate_crystal_packing.py --manifest runs/task/processed/representatives.csv --reference unoptimized_experimental.cif --output-dir runs/task/packing --timeout 30
 ```
 
-Run this separately in a compatible, licensed CSD Python API environment. Only
+Run this only if you have a separate CSD license and a compatible CCDC Python API environment. The repository does not install, download or redistribute the CCDC API or CSD records. Users without this license must skip this optional post-ranking step. Only
 standard-library dependencies are needed by this adapter; the reference and
 candidate paths must be readable by that environment. PackingSimilarity requires
 all 15 molecules in the shell, distance tolerance 0.2, angle tolerance 20°,

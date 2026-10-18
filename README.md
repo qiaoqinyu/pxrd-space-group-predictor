@@ -10,7 +10,7 @@ The code exposes the following reader-facing workflows:
 - preprocess experimental PXRD for classification;
 - rank precomputed candidate PXRD profiles with constrained dynamic time warping (DTW), optionally after an energy filter;
 - prepare conformers, run pinned BOMLIP-CSP generation and two-stage MACE relaxation, deduplicate structures and simulate PXRD;
-- optionally validate crystal packing with a separately licensed CSD Python API.
+- optionally validate crystal packing with a separately licensed CSD Python API. This step is unavailable without that license and local CCDC installation.
 
 The formal model uses a 3,400-point PXRD grid, a squeeze-and-excitation residual PXRD encoder, cached molecular embeddings, and a lightweight two-layer graph encoder during training. The graph pathway supplies classification and representation-alignment supervision. Evaluated inference logits use only PXRD and the molecular embedding.
 
