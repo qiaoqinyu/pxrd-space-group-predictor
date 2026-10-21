@@ -2,16 +2,18 @@
 
 ## Unified CLI
 
-Install with `python -m pip install '.[workflow]'`, then run `pxrd-sg --help`.
+For a new Linux x86-64 installation, follow the tested
+[Conda installation steps and version locks](environments/README.md), then run
+`pxrd-sg --help` and `pxrd-sg doctor`.
 The `predict`, `run`, `rank`, and `doctor` commands provide a single interface to
 the existing adapters. `run` requires an explicit candidate budget and GPU;
 prediction alone never starts CSP. See [CLI guide](docs/cli.md) and
 [environment profiles](environments/README.md). Download the paper's
 [trained classifier](docs/model-weights.md) and supply a local ChemBERTa snapshot.
 The weights are Release assets, separate from the source and wheel.
-The full GPU workflow uses a separately configured
-BOMLIP/MACE environment. The optional prediction container is a build recipe,
-not yet a verified published image.
+The full GPU workflow uses a separate BOMLIP/MACE Conda environment and requires
+a compatible NVIDIA driver and CUDA toolkit. The tested installation uses no
+container runtime.
 
 This repository provides the core method used to rank molecular-crystal space groups from PXRD and molecular information.
 

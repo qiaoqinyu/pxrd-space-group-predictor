@@ -5,6 +5,25 @@ description: Rank molecular-crystal space groups from experimental PXRD and SMIL
 
 # PXRD-guided space-group screening
 
+## Install and check the environment first
+
+For a new Linux x86-64 installation, read `environments/README.md` before
+installing dependencies. Prefer its tested Conda profiles and resolved version
+locks: `predict-cpu-linux.yml` for prediction and ranking, plus
+`mace-engine-linux.yml` for GPU generation and relaxation. Follow the complete
+installation commands in that guide; the YAML files alone only create Python
+and pip environments. Keep the two environments separate and pass the engine
+interpreter with `--engine-python`. The GPU profile also requires a compatible
+NVIDIA driver and CUDA toolkit. These profiles were validated on Linux x86-64;
+other platforms require separate verification.
+
+Reuse an existing dedicated installation after checking it with `pxrd-sg doctor`.
+Before a full run, obtain the model assets from `docs/model-weights.md` and
+`docs/downstream-workflow.md`, then run `pxrd-sg doctor --full` with the selected
+GPU, engine interpreter, BOMLIP checkout and MACE model. Proceed only when the
+checks pass. Use explicit input, model and output paths; local paths from another
+chat are not portable installation settings.
+
 ## Preferred installed interface
 
 Use `pxrd-sg --help` and read `docs/cli.md` when the installed CLI is available.

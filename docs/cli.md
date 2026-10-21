@@ -7,7 +7,14 @@ NVIDIA GPU environment. Windows users should use Linux/WSL2 for this orchestrati
 
 ## Installation
 
-Install the package from this checkout into a dedicated environment:
+For a new Linux x86-64 installation, first follow the tested Conda profiles and
+resolved version locks in [`environments/README.md`](../environments/README.md).
+That guide installs the CLI and, for full runs, a separate GPU engine. The YAML
+files create Python environments; the guide supplies the remaining installation
+commands. Use this route for the validated dependency versions.
+
+Alternatively, install from this checkout into an existing compatible dedicated
+environment:
 
 ```bash
 python -m pip install '.[workflow]'

@@ -1,59 +1,101 @@
-# Environment profiles
+# Conda environment profiles
 
-The CLI runs prediction/processing in one environment and can launch generation
-and relaxation with `--engine-python` in another. Neither requires CSD for the
-public workflow. Do not copy the whole research environment or upgrade its engine
-dependencies by installing the predictor into it.
+The CLI uses one environment for prediction, candidate processing and ranking.
+It can call generation and MACE relaxation through a second Python interpreter
+set with `--engine-python`. Keep the environments separate: the verified engine
+uses older PyTorch and NumPy versions than the prediction stack. Neither public
+workflow requires CSD. Do not install the CLI into an existing research or MACE
+environment.
 
-## Prediction and ranking
+## CPU prediction and ranking
 
-For CPU prediction/ranking on Linux x86-64, use a dedicated Python 3.10
-environment and the complete resolved package-version list:
-
-```bash
-python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip
-.venv/bin/python -m pip install --no-deps --index-url https://download.pytorch.org/whl/cpu torch==2.7.1+cpu
-.venv/bin/python -m pip install -r environments/predict-cpu-linux.lock.txt
-.venv/bin/python -m pip install --no-deps .
-.venv/bin/pxrd-sg doctor
-.venv/bin/python -m pip check
-```
-
-The CPU lock was captured from a new venv with system-site-packages disabled.
-It pins all installed runtime package versions, including transitive dependencies;
-it does not pin wheel hashes or operating-system libraries. Install PyTorch first
-as shown because its CPU wheel uses a separate index. `predict-linux.txt` is the
-broader direct-dependency profile for an existing compatible GPU environment.
-Neither is the historical training environment. Preserve the package versions
-in `run.json` when interpreting results across machines. Linux x86-64 validation
-does not establish that this lock works on Apple Silicon or native Windows.
-
-## MACE engine
-
-Follow the installation instructions for the clean BOMLIP commit in
-`docs/downstream-workflow.md`. The verified engine has Python 3.10, PyTorch 2.4.1,
-NumPy 1.26.4, SciPy 1.14.1, pymatgen 2024.11.13, ASE 3.23.0, MACE 0.3.13,
-cuEquivariance 0.4.0 and Ninja 1.13.2. Versions alone do not identify patched
-sources; the adapter uses the pinned BOMLIP source snapshot and MACE model hash.
-This is a compatibility record, not a standalone engine installer.
-
-The unified CLI supplies its installed adapter path to the engine interpreter.
-Use `doctor --full` with the engine and model paths before a calculation.
-
-## Container recipe
-
-`containers/Dockerfile.predict` is an optional prediction/ranking image recipe.
-Models and data are mounted at runtime and are not included. It is not a full
-CUDA/MACE image. A complete GPU image requires an independently tested engine
-installation. The current validation host denies access to its Docker daemon;
-this recipe has not been build-tested there.
+Create a Linux x86-64 Python 3.10 environment, then install the CPU PyTorch wheel
+from PyTorch's CPU index and the resolved version lock:
 
 ```bash
-docker build -f containers/Dockerfile.predict -t pxrd-sg:predict .
-docker run --rm pxrd-sg:predict --help
+conda env create -f environments/predict-cpu-linux.yml
+conda activate pxrd-predict-cpu
+python -m pip install --no-deps --index-url https://download.pytorch.org/whl/cpu 'torch==2.7.1+cpu'
+python -m pip install --no-deps -r environments/predict-cpu-linux.lock.txt
+python -m pip install --no-deps .
+pxrd-sg doctor
+python -m pip check
 ```
 
-Use absolute mounted paths and preserve the output directory for resume. The
-host still needs compatible drivers/runtime for any future GPU image. Container
-packaging does not waive third-party software or model licensing requirements.
+The lock was captured from a clean Python 3.10 environment. It pins runtime
+packages and transitive versions, but not wheel hashes or operating-system
+libraries. `predict-linux.txt` is a broader direct-dependency profile for an
+existing compatible GPU environment. Neither profile is the historical training
+environment. Keep the package versions recorded in `run.json` when comparing
+results between machines. Linux x86-64 validation does not establish support for
+Apple Silicon or native Windows.
+
+The Conda CPU profile was tested on Linux x86-64 with a fresh Python 3.10
+environment: dependency checks, all 58 tests and real-checkpoint prediction
+passed. The installed environment occupied approximately 1.6 GB, excluding
+models and the Conda package cache. Run source tests from the repository root
+because some tests read files under `examples/`:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+## NVIDIA GPU MACE engine
+
+Use a Linux x86-64 host with an NVIDIA driver, CUDA toolkit, and a compatible GPU.
+Create a separate Python 3.10 environment. The lock pins the verified CUDA 12.1
+PyTorch build and PyG extension wheels. Install BOMLIP and its bundled MACE source
+from the exact commit used by this project:
+
+```bash
+conda env create -f environments/mace-engine-linux.yml
+conda activate pxrd-mace-engine
+
+mkdir -p engines
+git clone https://github.com/pic-ai-robotic-chemistry/BOMLIP-CSP.git engines/BOMLIP-CSP
+git -C engines/BOMLIP-CSP checkout --detach 2caf530c8aa2ca14230264bfe69bfbcd6952b41e
+
+python -m pip install --no-cache-dir -r environments/mace-engine-linux.lock.txt
+# Build from a temporary copy to keep the runtime checkout clean.
+BOMLIP_BUILD=$(mktemp -d)
+git -C engines/BOMLIP-CSP archive HEAD | tar -x -C "$BOMLIP_BUILD"
+python -m pip install --no-cache-dir --no-deps "$BOMLIP_BUILD/mace-bench/3rdparty/mace"
+python -m pip install --no-cache-dir --no-deps "$BOMLIP_BUILD/mace-bench"
+rm -r -- "$BOMLIP_BUILD"
+git -C engines/BOMLIP-CSP status --porcelain
+python -m pip check
+```
+
+The MACE source and BOMLIP batch optimizer must come from that checkout; do not
+substitute the separately published `mace-torch` package. Keep the checkout clean
+after installation because each run verifies and snapshots its pinned files.
+The `git status` command above must produce no output. Installing directly from
+the runtime checkout can leave build files that cause this check to fail.
+Set `CUDA_HOME` to the host CUDA toolkit if it is not `/usr/local/cuda` and make
+its `bin` directory available on `PATH`. The lock includes Python CUDA runtime
+libraries; it does not install the system driver or CUDA compiler. The verified
+host used PyTorch 2.4.1+cu121 with CUDA toolkit 12.6 and an NVIDIA A800.
+
+Fresh Conda environments passed an end-to-end execution check on 22 October
+2026: all eight CLI stages completed for synthetic PXRD, ethanol, space group 1
+and one candidate. Resume reused all eight stages without new attempts;
+independent ranking produced a byte-identical ranking table. All 613 recorded
+output hashes matched, and one ranked CIF was exported. This checks installation
+and execution, not recovery of an experimental structure or reproduction of the
+paper's results. The CPU environment used about 1.7 GB and the GPU engine about
+6.3 GB, excluding models, package caches and workflow outputs. Existing research
+environments were not modified. This route requires no container runtime.
+
+From the prediction environment, run a full preflight before candidate work:
+
+```bash
+pxrd-sg doctor --full --gpu 0 \
+  --engine-python /path/to/conda/envs/pxrd-mace-engine/bin/python \
+  --bomlip-root engines/BOMLIP-CSP \
+  --mace-model models/MACE-OFF23_small.model
+```
+
+Use the generated candidates only after reviewing the predicted space groups and
+choosing an explicit count and GPU. `--count 1` is an execution smoke test, not
+the paper's candidate budget. See [`docs/downstream-workflow.md`](../docs/downstream-workflow.md)
+for the fixed scientific settings and input/output requirements.
