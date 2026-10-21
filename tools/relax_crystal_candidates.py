@@ -8,7 +8,11 @@ import os
 from pathlib import Path
 import shutil
 import sys
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+ROOT = Path(__file__).resolve().parents[1]
+if (ROOT / "pyproject.toml").is_file():
+    sys.path.insert(0, str(ROOT))
+else:
+    sys.path.append(str(ROOT))
 from src.runtime.crystal_candidates import read_candidates, write_candidates, sha256
 from src.runtime.downstream_execution import snapshot, pin_mace_model, run_logged, record, BOMLIP_COMMIT
 

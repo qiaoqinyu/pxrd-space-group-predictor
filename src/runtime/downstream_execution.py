@@ -6,6 +6,7 @@ from pathlib import Path
 import shutil
 import signal
 import subprocess
+import threading
 from src.runtime.crystal_candidates import sha256
 
 BOMLIP_COMMIT = "2caf530c8aa2ca14230264bfe69bfbcd6952b41e"
@@ -50,9 +51,17 @@ def run_logged(command: list[str], *, cwd: Path, env: dict, log: Path, timeout: 
     with log.open("x") as stream:
         process = subprocess.Popen(command, cwd=cwd, env=env, stdout=stream,
                                    stderr=subprocess.STDOUT, start_new_session=True)
+        # A CLI stage may launch another supervised process group. Propagate
+        # the outer supervisor's termination so its engine does not keep running.
+        main_thread = threading.current_thread() is threading.main_thread()
+        previous = signal.getsignal(signal.SIGTERM)
+        def terminate(signum, frame):
+            raise InterruptedError("received SIGTERM from supervisor")
+        if main_thread:
+            signal.signal(signal.SIGTERM, terminate)
         try:
             code = process.wait(timeout=timeout)
-        except (subprocess.TimeoutExpired, KeyboardInterrupt):
+        except (subprocess.TimeoutExpired, KeyboardInterrupt, InterruptedError):
             os.killpg(process.pid, signal.SIGTERM)
             try:
                 process.wait(timeout=10)
@@ -60,6 +69,9 @@ def run_logged(command: list[str], *, cwd: Path, env: dict, log: Path, timeout: 
                 os.killpg(process.pid, signal.SIGKILL)
                 process.wait()
             raise
+        finally:
+            if main_thread:
+                signal.signal(signal.SIGTERM, previous)
     if code:
         raise RuntimeError(f"external process exited {code}; see {log}")
 

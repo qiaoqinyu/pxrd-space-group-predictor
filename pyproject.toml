@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "xraypro-spacegroup"
-version = "0.1.0.dev1"
+version = "0.2.0.dev1"
 description = "PXRD- and molecule-guided space-group screening for molecular crystals"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -14,6 +14,9 @@ dependencies = [
   "torch>=2.1",
 ]
 
+[project.scripts]
+pxrd-sg = "src.cli:main"
+
 [project.optional-dependencies]
 verification = ["dtaidistance>=2.3"]
 structures = ["rdkit>=2024.3", "pymatgen>=2024.5", "ase>=3.23"]
@@ -22,7 +25,15 @@ embedding = [
   "tokenizers>=0.19",
   "transformers>=4.41",
 ]
+workflow = ["rdkit>=2024.3", "pymatgen>=2024.5", "ase>=3.23", "safetensors>=0.4", "tokenizers>=0.19", "transformers>=4.41"]
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["src*"]
+include = ["src*", "tools*"]
+
+[tool.setuptools.data-files]
+"share/pxrd-space-group-predictor/skills/pxrd-space-group-screening" = ["skills/pxrd-space-group-screening/SKILL.md"]
+"share/pxrd-space-group-predictor/docs" = ["docs/cli.md", "docs/downstream-workflow.md"]
+"share/pxrd-space-group-predictor/configs" = ["configs/paper_protocol.json", "configs/model.example.json"]
+"share/pxrd-space-group-predictor/examples" = ["examples/make_synthetic_data.py"]
+"share/pxrd-space-group-predictor/environments" = ["environments/README.md", "environments/predict-linux.txt", "environments/predict-cpu-linux.lock.txt"]

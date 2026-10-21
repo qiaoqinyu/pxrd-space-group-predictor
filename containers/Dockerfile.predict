@@ -1,0 +1,17 @@
+FROM python:3.10-slim
+WORKDIR /opt/pxrd-sg
+RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
+COPY environments/predict-cpu-linux.lock.txt /opt/requirements.txt
+RUN python -m pip install --no-cache-dir --upgrade pip && python -m pip install --no-cache-dir --no-deps --index-url https://download.pytorch.org/whl/cpu torch==2.7.1+cpu
+RUN python -m pip install --no-cache-dir -r /opt/requirements.txt
+COPY pyproject.toml README.md ./
+COPY src ./src
+COPY tools ./tools
+COPY configs ./configs
+COPY skills ./skills
+COPY docs ./docs
+COPY examples ./examples
+COPY environments ./environments
+RUN python -m pip install --no-cache-dir --no-deps .
+WORKDIR /work
+ENTRYPOINT ["pxrd-sg"]

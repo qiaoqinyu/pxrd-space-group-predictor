@@ -1,5 +1,17 @@
 # PXRD Space Group Predictor
 
+## Unified CLI
+
+Install with `python -m pip install '.[workflow]'`, then run `pxrd-sg --help`.
+The `predict`, `run`, `rank`, and `doctor` commands provide a single interface to
+the existing adapters. `run` requires an explicit candidate budget and GPU;
+prediction alone never starts CSP. See [CLI guide](docs/cli.md) and
+[environment profiles](environments/README.md). Prediction still requires a
+separately supplied trained checkpoint and local ChemBERTa snapshot; private
+weights are not bundled. The full GPU workflow uses a separately configured
+BOMLIP/MACE environment. The optional prediction container is a build recipe,
+not yet a verified published image.
+
 This repository provides the core method used to rank molecular-crystal space groups from PXRD and molecular information.
 
 The code exposes the following reader-facing workflows:

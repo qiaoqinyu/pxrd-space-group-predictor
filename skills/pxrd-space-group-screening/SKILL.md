@@ -5,7 +5,26 @@ description: Rank molecular-crystal space groups from experimental PXRD and SMIL
 
 # PXRD-guided space-group screening
 
-Use the existing CLI tools to execute the requested prediction or candidate-ranking task. Resolve any symlink to this skill directory first, then resolve the repository root from that directory (`../..`). Run commands from that root in its configured Python environment; inspect `README.md`, `pyproject.toml` and each tool's `--help` when needed.
+## Preferred installed interface
+
+Use `pxrd-sg --help` and read `docs/cli.md` when the installed CLI is available.
+For a wheel installation, resolve the documentation and configs from
+`<environment>/share/pxrd-space-group-predictor/`; this skill is under its
+`skills/` directory. The wheel does not create a source checkout.
+Run `pxrd-sg doctor` to check the environment. `predict` accepts raw PXRD, SMILES,
+the measured wavelength, a trusted checkpoint/hash and a local ChemBERTa snapshot.
+`run` adds candidate generation, MACE and ranking with explicit budget and GPU
+selection. `rank` accepts raw PXRD and a relaxed-candidate manifest without a
+classifier. Preserve `run.json`, logs and numbered stage directories. Reuse
+completed stages only with the identical command plus `--resume`.
+
+If the predicted shortlist contains Others, full execution stops rather than
+inventing a search group. Obtain concrete search groups before a new run. The
+engine may use a separate Python environment. CCDC validation remains optional
+and separately licensed. The installed interface does not distribute trained
+weights. The direct adapters below remain supported for individual stages.
+
+The direct adapter examples below assume a source checkout. In that case, resolve any symlink to this skill directory first, then resolve the repository root from that directory (`../..`). Run commands from that root in its configured Python environment; inspect `README.md`, `pyproject.toml` and each tool's `--help` when needed. For an installed wheel, use `python -m tools.<name>` instead of `python tools/<name>.py`, with explicit paths to the bundled configs.
 
 ## Establish inputs and model provenance
 

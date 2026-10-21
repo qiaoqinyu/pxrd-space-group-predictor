@@ -34,7 +34,17 @@ def make_bundle(path: Path, *, size: int, seed: int, labels: bool, graph: bool) 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--raw-only", action="store_true", help="Write a raw XY profile for the installed CLI execution example")
     args = parser.parse_args()
+    if args.raw_only:
+        args.output_dir.mkdir(parents=True, exist_ok=False)
+        theta = np.arange(5, 50.001, 0.02)
+        intensity = np.full_like(theta, 3.0)
+        for center, height, width in [(12, 100, .10), (18, 60, .15), (25, 80, .12), (35, 25, .18)]:
+            intensity += height * np.exp(-((theta - center) / width) ** 2)
+        np.savetxt(args.output_dir / "synthetic.xy", np.column_stack([theta, intensity]),
+                   header="Synthetic peaks for software testing only; not measured ethanol PXRD. 2theta(deg) intensity")
+        return
     make_bundle(args.output_dir / "train.npz", size=6, seed=1, labels=True, graph=True)
     make_bundle(args.output_dir / "val.npz", size=3, seed=2, labels=True, graph=True)
     make_bundle(args.output_dir / "test.npz", size=3, seed=3, labels=True, graph=False)
