@@ -36,7 +36,9 @@ The prediction-only Docker recipe has not been built: the validation host denies
 access to its Docker daemon. No complete GPU image is published. macOS and native
 Windows installations were not tested; WSL2/Linux is the full-workflow target.
 
-Classifier weights remain separately supplied. No restricted data, historical
-case outputs or private weights were released. A successful small run does not
+At the time of these CLI checks, the classifier was supplied privately. The
+subsequent `weights-v1` Release makes that same checkpoint publicly available;
+see [model weights](model-weights.md). No restricted data or historical case
+outputs are included in that release. A successful small run does not
 certify force convergence, structural identity or reproducibility across GPU
 architectures. Optional CCDC validation remains outside these checks.

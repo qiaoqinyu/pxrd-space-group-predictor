@@ -11,9 +11,19 @@
 
 ## Private evidence
 
-- Fixed paper splits, row-level predictions, checkpoints and seed aggregates.
+- Fixed paper splits, row-level predictions, unpublished checkpoints and seed aggregates.
 - Manuscript, SI, figure, manifest and checksum production.
 - Outcome-selected CSP case tables and diagnostics.
+
+## Public model asset
+
+The `weights-v1` Release provides the full_pretrained classifier for seed 240427,
+its configuration, provenance and SHA256 checksums. See `model-weights.md`.
+This designated checkpoint is authorized for public release. It contains learned
+tensors and model metadata, with no optimizer state or row-level dataset records.
+The file is separate from Git source history and Python packages. Other models
+and licensed datasets are not included. Formal software/model licensing remains
+pending; publication does not assign a new license.
 
 ## Downstream adapters and external engines
 
@@ -21,4 +31,4 @@ Public tools prepare conformers, call a pinned clean BOMLIP-CSP snapshot, run th
 
 ## Pending decisions
 
-Software licensing, authorship and citation metadata, model-weight redistribution, data assets and Zenodo deposition require separate approval.
+Software/model licensing, authorship and citation metadata, additional model releases, data assets and Zenodo deposition require separate approval.

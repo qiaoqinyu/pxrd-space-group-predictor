@@ -6,9 +6,10 @@ Install with `python -m pip install '.[workflow]'`, then run `pxrd-sg --help`.
 The `predict`, `run`, `rank`, and `doctor` commands provide a single interface to
 the existing adapters. `run` requires an explicit candidate budget and GPU;
 prediction alone never starts CSP. See [CLI guide](docs/cli.md) and
-[environment profiles](environments/README.md). Prediction still requires a
-separately supplied trained checkpoint and local ChemBERTa snapshot; private
-weights are not bundled. The full GPU workflow uses a separately configured
+[environment profiles](environments/README.md). Download the paper's
+[trained classifier](docs/model-weights.md) and supply a local ChemBERTa snapshot.
+The weights are Release assets, separate from the source and wheel.
+The full GPU workflow uses a separately configured
 BOMLIP/MACE environment. The optional prediction container is a build recipe,
 not yet a verified published image.
 
@@ -197,19 +198,20 @@ For example, ask your agent:
 > from my observed.txt and molecules.csv, using my compatible trained checkpoint.
 > Save the commands, input hashes and predictions in a new runs/ directory.
 
-**Trained checkpoints are not currently distributed in this repository.**
-Prediction requires a separately obtained compatible checkpoint, its model
-configuration, class mapping and preprocessing/embedding provenance. No public
-weight download is available yet. The agent must report this missing requirement
-when no checkpoint is supplied. Candidate DTW ranking can run without a classifier
-checkpoint. The synthetic example tests software execution only.
+**The paper's full_pretrained checkpoint for seed 240427 is publicly available.**
+The [model guide](docs/model-weights.md) provides the download, SHA256, class
+mapping and preprocessing/embedding requirements. This is one trained model,
+not an ensemble or all five runs used for aggregate paper results. The agent must
+verify the downloaded checkpoint before prediction. Candidate DTW ranking can
+run without a classifier checkpoint. The synthetic example tests execution only.
 
 The skill also guides conformer preparation, BOMLIP-CSP generation, two-stage
 MACE relaxation, deduplication, simulated PXRD and optional CCDC packing
 validation. See [the downstream workflow](docs/downstream-workflow.md) for
 commands, dependencies and verification limits. DFT remains a separate workflow.
-The skill and CLI scripts are provided in the Git checkout; the Python wheel
-contains the importable runtime, not these repository-level files.
+The wheel includes the CLI adapters and installs the skill, guides, configs,
+example generator and environment profiles under
+`<environment>/share/pxrd-space-group-predictor/`.
 
 To assemble prepared profiles and cached molecular embeddings, use:
 
@@ -227,9 +229,10 @@ For a trusted original SE-Res/simple-graph embedding checkpoint, use
 model configuration and an explicit provenance label. The importer requires the
 3400-point grid and creates a separate schema-1 copy by renaming graph keys;
 it does not change learned tensors. Check original-versus-converted predictions
-before scientific use. Weights and licensed inputs remain private until separately
-authorized for release.
+before scientific use. The designated public checkpoint is described in the
+[model guide](docs/model-weights.md). Licensed inputs and other unpublished
+research assets remain excluded.
 
 ## Release status
 
-This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-space-group-predictor. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. Software licensing, citation metadata, model-weight release and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.
+This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-space-group-predictor. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. The designated classifier is available in the `weights-v1` Release. Software/model licensing, citation metadata and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.

@@ -26,8 +26,8 @@ The installed skill and protocol files are under
 Prediction needs a compatible schema-1 classification checkpoint and its trusted
 SHA256, plus a local snapshot of `DeepChem/ChemBERTa-100M-MLM` revision
 `f5c45f44d3061f0346888f5c09db17ec1146d29d` including tokenizer files. Obtain these
-through an authorized model release or supplier. There is no public classifier
-weight release yet. This CLI does not download models or contact Hugging Face
+from the [public classifier release](model-weights.md) and the upstream ChemBERTa
+repository, respectively. This CLI does not download models or contact Hugging Face
 during a run. It records local snapshot hashes and canonicalizes input SMILES with
 the installed RDKit version. The version is recorded and may differ from the
 historical study; do not claim historical bitwise reproduction from execution alone.

@@ -21,8 +21,9 @@ completed stages only with the identical command plus `--resume`.
 If the predicted shortlist contains Others, full execution stops rather than
 inventing a search group. Obtain concrete search groups before a new run. The
 engine may use a separate Python environment. CCDC validation remains optional
-and separately licensed. The installed interface does not distribute trained
-weights. The direct adapters below remain supported for individual stages.
+and separately licensed. Download the classifier separately using
+`docs/model-weights.md`; the wheel does not bundle weights. The direct adapters
+below remain supported for individual stages.
 
 The direct adapter examples below assume a source checkout. In that case, resolve any symlink to this skill directory first, then resolve the repository root from that directory (`../..`). Run commands from that root in its configured Python environment; inspect `README.md`, `pyproject.toml` and each tool's `--help` when needed. For an installed wheel, use `python -m tools.<name>` instead of `python tools/<name>.py`, with explicit paths to the bundled configs.
 
@@ -30,7 +31,7 @@ The direct adapter examples below assume a source checkout. In that case, resolv
 
 For prediction, obtain experimental two-column 2theta/intensity text, canonical isomeric SMILES, stable sample IDs and a compatible trained checkpoint. Confirm that angles are degrees 2theta and record the radiation/wavelength used to obtain each pattern. The paper protocol uses Cu Kα radiation; different experimental conditions require a compatibility assessment, not silent conversion. Read `configs/paper_protocol.json` and the README's array contract. Synthetic examples validate execution only; they are not trained paper models.
 
-Trained weights are not distributed in this repository; obtain a compatible checkpoint separately. There is currently no public weight download. Record checkpoint SHA256, model configuration, class mapping and training provenance. If unavailable, report the missing asset and stop prediction; candidate ranking can still run independently. Never replace a missing trained checkpoint with random weights. For a trusted historical SE-Res/simple-graph checkpoint, `tools/import_legacy_checkpoint.py` creates a new schema-1 copy with restricted loading and exact graph-key renaming. Supply a verified hash, configuration, class mapping and provenance label. Confirm prediction parity against its original implementation before scientific use. A single checkpoint does not reproduce aggregate results from multiple training runs.
+The `weights-v1` GitHub Release provides the paper's full_pretrained checkpoint for seed 240427. Follow `docs/model-weights.md` to download it and verify its SHA256. Record the model configuration, class mapping and training provenance. Obtain ChemBERTa separately at the documented revision. If a required asset is unavailable, report it and stop prediction; candidate ranking can still run independently. Never replace a missing trained checkpoint with random weights. The public checkpoint is already in schema-1 format and does not need conversion. For other trusted historical SE-Res/simple-graph checkpoints, `tools/import_legacy_checkpoint.py` creates a separate schema-1 copy through exact graph-key renaming. Confirm prediction parity against the original implementation before scientific use. A single checkpoint does not reproduce aggregate results from multiple training runs.
 
 ## Predict space groups
 

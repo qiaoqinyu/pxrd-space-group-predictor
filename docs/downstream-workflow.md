@@ -140,8 +140,9 @@ the final ten should be validated. DFT remains a separate workflow.
 Tests cover manifests, hash/unit checks, molecular normalization, synthetic
 structures, subprocess failure/timeout and the existing classifier/DTW workflows.
 Execution smoke tests do not establish predictive accuracy or reproduce the
-paper's full CSP results. Trained prediction weights and licensed datasets remain
-separate assets; do not substitute synthetic/random weights for missing models.
+paper's full CSP results. The [trained classifier](model-weights.md) is a separate
+public Release download. Licensed datasets remain excluded. Obtain ChemBERTa
+and MACE through their upstream sources; do not substitute random weights.
 
 The verification run included one real ethanol candidate through generation,
 two-stage MACE, deduplication, simulation and DTW. Original-helper comparisons
