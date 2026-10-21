@@ -1,5 +1,10 @@
 # Staging audit record
 
+> Historical record: this describes checks at the date in the title/body, not
+> current installation status. Use [the environment guide](../environments/README.md)
+> and [CLI guide](cli.md) for current instructions.
+
+
 Date: 2026-09-09
 
 ## Post-review corrections (2026-09-09)

@@ -27,7 +27,7 @@ PY
 ```
 
 The file is 19,426,259 bytes. The release also includes `model_config.json`,
-`provenance.json`, this guide as `MODEL_CARD.md`, and `SHA256SUMS` for all four files.
+`provenance.json`, the release-time model card as `MODEL_CARD.md`, and `SHA256SUMS` for all four files.
 The configuration and class mapping are embedded in the checkpoint.
 
 Use the verified file with the installed CLI:
@@ -90,3 +90,50 @@ requires the user's own CSD license. See [the downstream guide](downstream-workf
 
 The author has authorized public distribution of this file. Formal software and
 model license terms are still pending; no additional license is assigned here.
+
+## Download ChemBERTa
+
+In the prediction environment, use the included `huggingface_hub` package to
+fetch the fixed [upstream revision](https://huggingface.co/DeepChem/ChemBERTa-100M-MLM/tree/f5c45f44d3061f0346888f5c09db17ec1146d29d):
+
+```bash
+python - <<'PYCODE'
+from huggingface_hub import snapshot_download
+snapshot_download(
+    repo_id="DeepChem/ChemBERTa-100M-MLM",
+    revision="f5c45f44d3061f0346888f5c09db17ec1146d29d",
+    local_dir="models/chemberta",
+    allow_patterns=["*.json", "*.txt", "*.safetensors"],
+)
+PYCODE
+pxrd-sg doctor --checkpoint models/full_pretrained_seed240427.pt \
+  --checkpoint-sha256 "$MODEL_SHA256" --chemberta models/chemberta
+```
+
+Download requires network access; subsequent CLI runs use the local snapshot.
+Keep its tokenizer, configuration and safetensors files together.
+
+## MACE for full runs
+
+MACE-OFF23-small is supplied by [ACEsuit/mace-off](https://github.com/ACEsuit/mace-off).
+Its [Academic Software License](https://github.com/ACEsuit/mace-off/blob/main/LICENSE.md)
+permits academic use and restricts commercial use; users must comply with those
+terms. The project's software license does not replace the model's license.
+
+```bash
+mkdir -p models
+curl --fail --location \
+  https://raw.githubusercontent.com/ACEsuit/mace-off/main/mace_off23/MACE-OFF23_small.model \
+  --output models/MACE-OFF23_small.model
+python - <<'PYCODE'
+import hashlib
+from pathlib import Path
+expected = "165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f"
+if hashlib.sha256(Path("models/MACE-OFF23_small.model").read_bytes()).hexdigest() != expected:
+    raise SystemExit("MACE SHA256 mismatch: stop; do not substitute another model")
+print("MACE SHA256 verified")
+PYCODE
+```
+
+The fixed hash identifies the required bytes even if the upstream branch changes.
+Use a new model directory or reuse verified files; preserve existing model assets.

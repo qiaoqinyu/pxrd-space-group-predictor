@@ -8,13 +8,13 @@ Protocol agreement does not imply bitwise reproduction of historical results.
 
 ## Environment and inputs
 
-Use an environment containing the project's dependencies plus RDKit, pymatgen
-and ASE (`.[structures]`). Generation additionally needs BOMLIP-CSP's dependencies;
-relaxation needs its batchopt/MACE stack, CUDA, cuEquivariance and Ninja. Inspect
-the upstream environment requirements before installing anything. Invoke Python
-from that environment; the relaxation adapter prepends its bin directory to PATH
-and its isolated upstream batchopt source to PYTHONPATH. Do not combine arbitrary
-PyTorch/CUDA/cuEquivariance versions.
+For the primary workflow, follow [the tested Conda installation](../environments/README.md)
+and [the CLI guide](cli.md). Keep prediction and engine environments separate;
+pass the engine interpreter through `--engine-python`.
+
+The per-stage Python commands below are advanced source-checkout interfaces.
+Run generation and relaxation with the engine Python, and processing/scoring
+with the prediction Python. Consult each command's `--help` for parameters.
 
 Obtain a **clean** clone of
 https://github.com/pic-ai-robotic-chemistry/BOMLIP-CSP at commit
@@ -26,7 +26,9 @@ lookup, with before/after hashes recorded. Upstream MIT licensing remains upstre
 
 Supply a trusted local MACE-OFF23-small model with SHA256
 `165cce4cfec5a34b9c64d4ebf95de15d71106bb584b7291c8470f0749977c46f`.
-The adapter checks this hash before loading. There is no automatic model download.
+The adapter checks this hash before loading. Download and verify the model using
+[the model asset guide](model-weights.md#mace-for-full-runs). There is no automatic
+model download during execution.
 Generation and MACE runs require explicit compute authorization from the operator;
 a prediction request alone must not launch them. Choose available hardware first.
 

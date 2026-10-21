@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0.dev1 — current development version
+
+- Added the unified predict, run, rank and doctor CLI, with checked stage resume.
+- Published the designated classifier separately in weights-v1.
+- Added validated separate Conda prediction and GPU-engine profiles.
+- Simplified the agent skill and made CLI installation the primary documented path.
+- Moved training and direct-adapter guidance to advanced usage.
+
+
 ## 0.1.0.dev1 — manuscript/SI synchronization (2026-10-08)
 
 - Aligned DTW with linear intensities, Euclidean local cost and window 31 semantics.

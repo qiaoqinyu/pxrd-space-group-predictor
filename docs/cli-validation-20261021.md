@@ -1,5 +1,10 @@
 # Unified CLI validation — 21 October 2026
 
+> Historical record: this describes checks at the date in the title/body, not
+> current installation status. Use [the environment guide](../environments/README.md)
+> and [CLI guide](cli.md) for current instructions.
+
+
 The `0.2.0.dev1` interface wraps the existing scientific adapters. The checks
 below establish software execution within the stated environments. They do not
 reproduce the paper's full case study or establish prediction accuracy.

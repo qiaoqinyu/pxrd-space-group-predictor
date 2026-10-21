@@ -1,8 +1,8 @@
 # Installed CLI
 
 The installed `pxrd-sg` command connects the existing scientific adapters. It does
-not change their scientific settings. Python 3.10 on Linux is the first full-run
-target; macOS can use CPU prediction/ranking. Full MACE runs require a compatible
+not change their scientific settings. Python 3.10 on Linux x86-64 is the validated target.
+macOS and native Windows installations remain unverified. Full MACE runs require a compatible
 NVIDIA GPU environment. Windows users should use Linux/WSL2 for this orchestration.
 
 ## Installation
@@ -26,7 +26,8 @@ This dependency-range installation is a convenience, not a frozen historical
 environment. See `environments/README.md` for the tested version profiles. The
 wheel includes all command adapters, so commands work outside the checkout.
 The installed skill and protocol files are under
-`$VIRTUAL_ENV/share/pxrd-space-group-predictor/` for a virtual environment.
+`<environment>/share/pxrd-space-group-predictor/`. Locate the active environment
+with `python -c 'import sys; print(sys.prefix)'` in Conda or venv.
 
 ## Required model assets
 
@@ -107,7 +108,8 @@ and up to ten by DTW. No classifier or ChemBERTa checkpoint is required.
 The bundled generator writes a small, unrestricted XY profile:
 
 ```bash
-python "$VIRTUAL_ENV/share/pxrd-space-group-predictor/examples/make_synthetic_data.py" \
+PXRD_ENV=$(python -c 'import sys; print(sys.prefix)')
+python "$PXRD_ENV/share/pxrd-space-group-predictor/examples/make_synthetic_data.py" \
   --raw-only --output-dir example-input
 ```
 

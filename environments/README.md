@@ -9,7 +9,8 @@ environment.
 
 ## CPU prediction and ranking
 
-Create a Linux x86-64 Python 3.10 environment, then install the CPU PyTorch wheel
+Run the commands below from the cloned repository root. Create a Linux x86-64
+Python 3.10 environment, then install the CPU PyTorch wheel
 from PyTorch's CPU index and the resolved version lock:
 
 ```bash
@@ -32,7 +33,7 @@ Apple Silicon or native Windows.
 
 The Conda CPU profile was tested on Linux x86-64 with a fresh Python 3.10
 environment: dependency checks, all 58 tests and real-checkpoint prediction
-passed. The installed environment occupied approximately 1.6 GB, excluding
+passed. The installed environment occupied approximately 1.7 GB, excluding
 models and the Conda package cache. Run source tests from the repository root
 because some tests read files under `examples/`:
 

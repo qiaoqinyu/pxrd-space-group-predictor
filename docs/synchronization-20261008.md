@@ -1,5 +1,10 @@
 # Manuscript synchronization — 8 October 2026
 
+> Historical record: this describes checks at the date in the title/body, not
+> current installation status. Use [the environment guide](../environments/README.md)
+> and [CLI guide](cli.md) for current instructions.
+
+
 This update aligns the public core with the current manuscript and complete SI.
 See [paper-code-map.md](paper-code-map.md) for methods, class mapping and external-stage boundaries.
 The September staging audit remains a historical record.
