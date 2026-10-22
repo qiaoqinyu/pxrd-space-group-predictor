@@ -25,9 +25,7 @@ python -m pip check
 
 The lock was captured from a clean Python 3.10 environment. It pins runtime
 packages and transitive versions, but not wheel hashes or operating-system
-libraries. `predict-linux.txt` is a broader direct-dependency profile for an
-existing compatible GPU environment. Neither profile is the historical training
-environment. Keep the package versions recorded in `run.json` when comparing
+libraries. This profile is not the historical training environment. Keep the package versions recorded in `run.json` when comparing
 results between machines. Linux x86-64 validation does not establish support for
 Apple Silicon or native Windows.
 

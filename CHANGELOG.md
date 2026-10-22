@@ -7,6 +7,8 @@
 - Added validated separate Conda prediction and GPU-engine profiles.
 - Simplified the agent skill and made CLI installation the primary documented path.
 - Moved training and direct-adapter guidance to advanced usage.
+- Removed superseded internal audit records, the unused container recipe and
+  the unpinned alternative dependency list from the current source tree.
 
 
 ## 0.1.0.dev1 — manuscript/SI synchronization (2026-10-08)

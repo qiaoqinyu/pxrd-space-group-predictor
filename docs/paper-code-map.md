@@ -1,9 +1,8 @@
 # Correspondence to the current manuscript and Supporting Information
 
-Baseline: 18 October 2026, manuscript
-`乔钦禹文章-2026.10.18_agent_workflow_reviewed.docx` and
-`乔钦禹文章Supporting_Information_2026.10.18_agent_workflow_reviewed.docx`. This document supersedes the protocol descriptions in
-the September staging audit, which remains a historical record.
+This guide maps the reported methods to the public implementation. It covers
+numerical settings and data boundaries; installation and execution instructions
+are in [the CLI guide](cli.md).
 
 | Paper component | Public implementation | Verification or boundary |
 | --- | --- | --- |
