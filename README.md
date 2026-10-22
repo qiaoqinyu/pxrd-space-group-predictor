@@ -1,93 +1,81 @@
 # PXRD Space Group Predictor
 
-## Unified CLI
+Predict molecular-crystal space groups from an experimental powder X-ray diffraction (PXRD) pattern and a molecular SMILES string. Use the predicted shortlist to guide crystal structure prediction, then rank candidate structures by energy and agreement with the experimental PXRD pattern.
 
-For a new Linux x86-64 installation, follow the tested
-[Conda installation steps and version locks](environments/README.md), then run
-`pxrd-sg --help` and `pxrd-sg doctor`.
-The `predict`, `run`, `rank`, and `doctor` commands provide a single interface to
-the existing adapters. `run` requires an explicit candidate budget and GPU;
-prediction alone never starts CSP. See [CLI guide](docs/cli.md) and
-[environment profiles](environments/README.md). Download the paper's
-[trained classifier](docs/model-weights.md) and supply a local ChemBERTa snapshot.
-The weights are Release assets, separate from the source and wheel.
-The full GPU workflow uses a separate BOMLIP/MACE Conda environment and requires
-a compatible NVIDIA driver and CUDA toolkit. The tested installation uses no
-container runtime.
+The project provides a command-line interface (`pxrd-sg`) and a companion skill for AI agents.
 
-This repository provides the core method used to rank molecular-crystal space groups from PXRD and molecular information.
+```text
+Experimental PXRD + molecular SMILES
+                 ↓
+       Space-group prediction
+                 ↓
+   Candidate generation with BOMLIP-CSP
+                 ↓
+        MACE structure relaxation
+                 ↓
+  Deduplication and PXRD simulation
+                 ↓
+   Energy preselection and DTW ranking
+                 ↓
+       Ranked candidates and CIFs
+```
 
-The code exposes the following reader-facing workflows:
+DTW (dynamic time warping) measures agreement between diffraction profiles. Candidate rankings support further structure assessment; they do not establish structural identity.
 
-- train a PXRD + molecular-embedding classifier with an optional crystal-graph teacher;
-- evaluate ordinary and class-balanced TOP-K recall;
-- run graph-free inference from PXRD and molecular embeddings;
-- preprocess experimental PXRD for classification;
-- rank precomputed candidate PXRD profiles with constrained dynamic time warping (DTW), optionally after an energy filter;
-- prepare conformers, run pinned BOMLIP-CSP generation and two-stage MACE relaxation, deduplicate structures and simulate PXRD;
-- optionally validate crystal packing with a separately licensed CSD Python API. This step is unavailable without that license and local CCDC installation.
+## What you can run
 
-The formal model uses a 3,400-point PXRD grid, a squeeze-and-excitation residual PXRD encoder, cached molecular embeddings, and a lightweight two-layer graph encoder during training. The graph pathway supplies classification and representation-alignment supervision. Evaluated inference logits use only PXRD and the molecular embedding.
+| Command | Inputs | Outputs |
+| --- | --- | --- |
+| `pxrd-sg predict` | Raw PXRD, molecular SMILES and model assets | Space-group probabilities and a ranked shortlist |
+| `pxrd-sg run` | Prediction inputs, engine assets and an explicit search budget | Candidate structures, energies, DTW rankings and selected CIFs |
+| `pxrd-sg rank` | Raw PXRD and a relaxed-candidate manifest | Candidate rankings and selected CIFs, without classifier inference |
 
-## Scope
+`pxrd-sg doctor` checks dependencies and supplied assets before computation. Runs record input/model hashes, settings and output checksums. Use `--resume` to reuse verified completed stages.
 
-This repository provides the core software, not a complete paper-reproduction package. It intentionally excludes:
-
-- licensed CSD and ICDD/PDF source records and row-level derivatives;
-- molecular identifiers, experimental PXRD arrays, crystal coordinates and CIFs;
-- trained checkpoints whose redistribution rights have not been cleared;
-- manuscript, figure, Supporting Information and internal evidence builders;
-- historical case-specific calculation outputs and proprietary computational engines.
-
-Downstream adapters call separately installed scientific engines. See [the downstream workflow](docs/downstream-workflow.md) for dependencies, fixed parameters and commands. DTW is a PXRD-consistency ranking signal and does not establish crystal-packing identity.
-
-## Start here
+## Quick start
 
 ```bash
 git clone https://github.com/qiaoqinyu/pxrd-space-group-predictor.git
 cd pxrd-space-group-predictor
 ```
 
-1. Follow [the Conda installation guide](environments/README.md).
-2. Obtain the [model assets](docs/model-weights.md) and run the environment checks.
-3. Use [the CLI guide](docs/cli.md) for prediction, full runs or independent ranking.
+1. Follow the [Conda installation guide](environments/README.md). Prediction and ranking use one environment; candidate generation and MACE relaxation use a separate GPU engine.
+2. Download and verify the [required model assets](docs/model-weights.md).
+3. Follow the [CLI examples](docs/cli.md) to check the environment and run prediction, a full workflow or independent ranking.
 
-Training, array contracts and individual Python adapters are documented in
-[advanced usage](docs/advanced-usage.md). They are not required for the CLI path.
+Supply PXRD as two columns: angle in degrees 2theta and linear intensity. The current CLI requires a wavelength of 1.54184 Å. Full runs also require a candidate count and GPU selection.
 
-## Agent skill
+The tested platform is Linux x86-64 with Python 3.10. MACE relaxation requires a compatible NVIDIA GPU, driver and CUDA toolkit. macOS and native Windows installations remain unverified. No container is required.
 
-The repository includes [PXRD space-group screening](skills/pxrd-space-group-screening/SKILL.md),
-a small agent guide for the CLI. Use the installation steps above.
+Start with the [one-candidate synthetic example](docs/cli.md#synthetic-execution-example) to check installation. Its artificial pattern tests execution, not predictive accuracy or experimental structure recovery.
 
-Open this checkout in an agent that supports project skills. The symlink under
-`.agents/skills/` points to the canonical skill. In Codex, invoke
-`$pxrd-space-group-screening`; with other agents, provide the full path to
-`skills/pxrd-space-group-screening/SKILL.md` and ask the agent to follow it.
-Keep the skill with the repository because it calls the repository's CLI tools.
-No global skill installation is required.
+## Use with an AI agent
 
-For example, ask your agent:
+The [PXRD screening skill](skills/pxrd-space-group-screening/SKILL.md) guides an agent through installation, input checks, CLI commands and result inspection. It uses the same CLI as a manual run.
 
-> Use the pxrd-space-group-screening skill to predict the top three space groups
-> from my observed.txt and supplied molecular SMILES, using the public checkpoint.
-> Save the commands, input hashes and predictions in a new runs/ directory.
+Open the checkout in Codex and invoke `$pxrd-space-group-screening`. For other agents, provide the path to `skills/pxrd-space-group-screening/SKILL.md`. No global skill installation is required.
 
-**The paper's full_pretrained checkpoint for seed 240427 is publicly available.**
-The [model guide](docs/model-weights.md) provides the download, SHA256, class
-mapping and preprocessing/embedding requirements. This is one trained model,
-not an ensemble or all five runs used for aggregate paper results. The agent must
-verify the downloaded checkpoint before prediction. Candidate DTW ranking can
-run without a classifier checkpoint. The synthetic example tests execution only.
+Example request:
 
-The skill also guides conformer preparation, BOMLIP-CSP generation, two-stage
-MACE relaxation, deduplication, simulated PXRD and optional CCDC packing
-validation. See [the downstream workflow](docs/downstream-workflow.md) for
-commands, dependencies and verification limits. DFT remains a separate workflow.
-The wheel includes the CLI adapters and installs the skill, guides, configs,
-example generator and environment profiles under
-`<environment>/share/pxrd-space-group-predictor/`.
+> Follow the PXRD screening skill to predict the top three space groups from my experimental PXRD file and molecular SMILES. Use the public checkpoint, verify the inputs and model assets, and save predictions and logs in a new output directory. Run prediction only.
 
-## Release status
+Candidate generation and GPU relaxation require a separately specified compute budget.
 
-This repository is publicly maintained at https://github.com/qiaoqinyu/pxrd-space-group-predictor. Transfer to the pic-ai-robotic-chemistry organization is planned only after the author requests it. The designated classifier is available in the `weights-v1` Release. Software/model licensing, citation metadata and data/Zenodo deposits remain pending. Public visibility does not grant an open-source license.
+## Models, data and licensing
+
+The [weights-v1 release](https://github.com/qiaoqinyu/pxrd-space-group-predictor/releases/tag/weights-v1) provides one classifier used in the paper. It is a single trained model, not an ensemble or the complete set of training runs. ChemBERTa and MACE are obtained separately from their upstream sources. See the [model guide](docs/model-weights.md) for downloads, verification and applicable terms.
+
+The repository does not distribute licensed CSD/PDF database records or restricted study datasets and historical calculation outputs. Users can supply their own inputs and export generated candidate CIFs. The public prediction and ranking workflow does not require a CSD license. Optional reference-based packing validation requires a separately licensed CCDC environment.
+
+Formal software and classifier license terms, citation metadata and archival deposition remain pending. Public visibility does not grant an open-source license. Upstream model and engine licenses apply separately.
+
+## Documentation and validation
+
+- [Installation and tested environments](environments/README.md)
+- [CLI commands, examples and resume behavior](docs/cli.md)
+- [Model downloads and provenance](docs/model-weights.md)
+- [Downstream methods and optional packing validation](docs/downstream-workflow.md)
+- [Training, array formats and direct adapters](docs/advanced-usage.md)
+- [Paper-to-code correspondence](docs/paper-code-map.md)
+
+Validation includes the 58-test suite and a one-candidate GPU workflow, with stage resume, independent ranking and output-hash checks. These checks establish software execution in the tested environments, not reproduction of the paper's full results. See the environment guide for the validation scope.
