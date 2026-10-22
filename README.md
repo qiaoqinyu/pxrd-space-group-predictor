@@ -51,9 +51,9 @@ Start with the [one-candidate synthetic example](docs/cli.md#synthetic-execution
 
 ## Use with an AI agent
 
-The [PXRD screening skill](skills/pxrd-space-group-screening/SKILL.md) guides an agent through installation, input checks, CLI commands and result inspection. It uses the same CLI as a manual run.
+The [PXRD screening skill](skills/pxrd-space-group-predictor/SKILL.md) guides an agent through installation, input checks, CLI commands and result inspection. It uses the same CLI as a manual run.
 
-Open the checkout in Codex and invoke `$pxrd-space-group-screening`. For other agents, provide the path to `skills/pxrd-space-group-screening/SKILL.md`. No global skill installation is required.
+Open the checkout in Codex and invoke `$pxrd-space-group-predictor`. For other agents, provide the path to `skills/pxrd-space-group-predictor/SKILL.md`. No global skill installation is required.
 
 Example request:
 

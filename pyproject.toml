@@ -32,7 +32,7 @@ where = ["."]
 include = ["src*", "tools*"]
 
 [tool.setuptools.data-files]
-"share/pxrd-space-group-predictor/skills/pxrd-space-group-screening" = ["skills/pxrd-space-group-screening/SKILL.md"]
+"share/pxrd-space-group-predictor/skills/pxrd-space-group-predictor" = ["skills/pxrd-space-group-predictor/SKILL.md"]
 "share/pxrd-space-group-predictor/docs" = ["docs/cli.md", "docs/downstream-workflow.md", "docs/model-weights.md", "docs/advanced-usage.md", "docs/paper-code-map.md"]
 "share/pxrd-space-group-predictor/configs" = ["configs/paper_protocol.json", "configs/model.example.json"]
 "share/pxrd-space-group-predictor/examples" = ["examples/make_synthetic_data.py"]

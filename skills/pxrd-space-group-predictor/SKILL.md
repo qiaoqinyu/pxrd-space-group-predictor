@@ -1,5 +1,5 @@
 ---
-name: pxrd-space-group-screening
+name: pxrd-space-group-predictor
 description: Use the pxrd-sg CLI to predict molecular-crystal space groups from PXRD and SMILES, run BOMLIP/MACE candidate generation and relaxation, or rank existing crystal candidates.
 ---
 
